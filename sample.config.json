@@ -1,0 +1,10 @@
+{
+  "account": "your_account",
+  "user": "your_name",
+  "role": "ACCOUNTADMIN",
+  "password": "1234567",
+  "warehouse": "COMPUTE_WH",
+  "database": "IOE",
+  "schema": "PUBLIC",
+  "log_path": "./logs/snowflake.log"
+}

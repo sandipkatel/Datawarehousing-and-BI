@@ -1,4 +1,11 @@
-.venv
+# virtual environment
+.venv/
+venv/
+
+# python
+*.pyc
 \__pycache__
+
+# logs and config
 \log
 config.json
