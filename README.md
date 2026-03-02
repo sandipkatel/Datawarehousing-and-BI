@@ -1,6 +1,13 @@
-# Snowflake ETL Pipeline
+# Data Warehouse ETL Pipeline
 
-ETL pipeline to load data into a Snowflake data warehouse using the **Snowflake Schema** design.
+ETL pipeline to load data into a Snowflake data warehouse supporting both **Star Schema** and **Snowflake Schema** designs with **SCD Type 2** (Slowly Changing Dimensions).
+
+## Schema Types
+
+| Schema | Description |
+|--------|-------------|
+| **Star Schema** | Denormalized design with dimension tables directly connected to fact table. Faster queries, simpler joins. |
+| **Snowflake Schema** | Normalized design with dimension tables split into sub-dimensions. Less redundancy, more complex joins. |
 
 ## What Does This Do?
 
@@ -9,7 +16,9 @@ This pipeline:
 2. Loads into **temporary tables** (TMP) for processing
 3. Applies changes to **target dimension & fact tables** (TGT)
 
-It handles **SCD Type 2** (Slowly Changing Dimensions) - tracking historical changes in dimension tables.
+It handles **SCD Type 2** (Slowly Changing Dimensions) - tracking historical changes in dimension tables with:
+- `IS_CURRENT` flag to identify active records
+- `EFFECTIVE_FROM` / `EFFECTIVE_TO` timestamps for versioning
 
 ## Project Structure
 
@@ -17,27 +26,19 @@ It handles **SCD Type 2** (Slowly Changing Dimensions) - tracking historical cha
 .
 ├── README.md
 ├── config.json
-├── ddl
+├── ddl/
 │   └── ddl_file.sql
 ├── requirements.txt
 ├── sample.config.json
-├── src
-│   └── snowflake_etl
-│       ├── __init__.py
-│       ├── core
-│       │   ├── __init__.py
-│       │   ├── config.py
-│       │   ├── database.py
-│       │   ├── exceptions.py
-│       │   └── logger.py
-│       ├── loaders
-│       │   ├── __init__.py
-│       │   ├── base.py
-│       │   ├── dimension.py
-│       │   └── fact.py
-│       ├── main.py
-│       └── orchestrator.py
-└── venv
+└── src/
+    ├── src/
+    │    ├── snowflake/         # Snowflake Schema
+    │    └── star/              # Star Schema
+    └── snowflake_etl/          # Professional ETL framework for SCD2
+        ├── core/               # Config, DB connection, logging
+        ├── loaders/            # Dimension & fact loaders
+        ├── main.py             # CLI entry point
+        └── orchestrator.py     # Pipeline orchestration
 ```
 
 ## Setup
@@ -60,10 +61,13 @@ Create `config.json` in the project root:
   "warehouse": "COMPUTE_WH",
   "database": "YOUR_DATABASE",
   "role": "ACCOUNTADMIN",
-  "stg_schema": "STG",
-  "tmp_schema": "TMP",
-  "tgt_schema": "TGT",
-  "log_path": "./logs"
+  "schema": "PUBLIC",
+  "log_path": "./logs",
+  "LND_SCHEMA": "LND",
+  "FILE_STAGE": "SALES_STAGE",
+  "STG_SCHEMA": "STG",
+  "TMP_SCHEMA": "TMP",
+  "TGT_SCHEMA": "TGT"
 }
 ```
 

@@ -6,5 +6,10 @@
   "warehouse": "COMPUTE_WH",
   "database": "IOE",
   "schema": "PUBLIC",
-  "log_path": "./logs/snowflake.log"
+  "log_path": "./logs/snowflake.log",
+  "LND_SCHEMA": "LND",
+  "FILE_STAGE": "SALES_STAGE",
+  "STG_SCHEMA": "STG",
+  "TMP_SCHEMA": "TMP",
+  "TGT_SCHEMA": "TGT"
 }
