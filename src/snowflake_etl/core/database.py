@@ -55,17 +55,33 @@ class SnowflakeConnection:
             return
 
         try:
-            self.logger.info(f"Connecting to Snowflake account: {self.db_config.account}")
+            self.logger.info(
+                f"Connecting to Snowflake account: {self.db_config.account}"
+            )
+            # Connect without database/warehouse to avoid errors with suspended warehouse
             self._connection = snowflake.connector.connect(
                 user=self.db_config.user,
                 password=self.db_config.password,
                 account=self.db_config.account,
-                database=self.db_config.database,
-                warehouse=self.db_config.warehouse,
                 role=self.db_config.role,
                 client_telemetry_enabled=False,
             )
             self._cursor = self._connection.cursor()
+
+            # Set warehouse first (this resumes it if suspended)
+            try:
+                self.logger.info(f"Setting warehouse: {self.db_config.warehouse}")
+                self._cursor.execute(f'USE WAREHOUSE "{self.db_config.warehouse}"')
+            except Exception as wh_err:
+                self.logger.warning(f"Warehouse error (continuing): {wh_err}")
+
+            # Then set database
+            try:
+                self.logger.info(f"Setting database: {self.db_config.database}")
+                self._cursor.execute(f'USE DATABASE "{self.db_config.database}"')
+            except Exception as db_err:
+                self.logger.warning(f"Database error (continuing): {db_err}")
+
             self.logger.info("Successfully connected to Snowflake")
         except Exception as e:
             self.logger.error(f"Failed to connect to Snowflake: {e}")

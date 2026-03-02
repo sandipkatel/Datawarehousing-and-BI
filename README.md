@@ -14,18 +14,30 @@ It handles **SCD Type 2** (Slowly Changing Dimensions) - tracking historical cha
 ## Project Structure
 
 ```
-snowflake_etl/
-├── main.py           # Run the pipeline from here
-├── orchestrator.py   # Controls the load order
-├── core/
-│   ├── config.py     # Reads config.json
-│   ├── database.py   # Connects to Snowflake
-│   ├── logger.py     # Writes logs
-│   └── exceptions.py # Error handling
-└── loaders/
-    ├── base.py       # Base class for all loaders
-    ├── dimension.py  # Dimension loaders (Country, City, Product, etc.)
-    └── fact.py       # Fact table loader (Sales)
+.
+├── README.md
+├── config.json
+├── ddl
+│   └── ddl_file.sql
+├── requirements.txt
+├── sample.config.json
+├── src
+│   └── snowflake_etl
+│       ├── __init__.py
+│       ├── core
+│       │   ├── __init__.py
+│       │   ├── config.py
+│       │   ├── database.py
+│       │   ├── exceptions.py
+│       │   └── logger.py
+│       ├── loaders
+│       │   ├── __init__.py
+│       │   ├── base.py
+│       │   ├── dimension.py
+│       │   └── fact.py
+│       ├── main.py
+│       └── orchestrator.py
+└── venv
 ```
 
 ## Setup
@@ -92,20 +104,3 @@ The pipeline loads tables in this order (respecting dependencies):
 ## Logs
 
 Logs are saved to `./logs/` folder with timestamps.
-
-## Quick Python Example
-
-```python
-from snowflake_etl.core.config import Settings
-from snowflake_etl.orchestrator import ETLOrchestrator
-
-settings = Settings.from_json("config.json")
-orchestrator = ETLOrchestrator(settings)
-result = orchestrator.run()
-
-print("Success!" if result.success else "Failed!")
-```
-
-## License
-
-MIT
